@@ -188,7 +188,8 @@ export default function AdminPage() {
       const uploadResponse = await uploadImages(fileArray)
       
       if (uploadResponse.success) {
-        const uploadedUrls = uploadResponse.files
+        // Extract URLs from the response
+        const uploadedUrls = uploadResponse.files.map((file: { url: string; path: string }) => file.url)
         
         if (isEditing && editingEvent) {
           setEditingEvent({

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { uploadImageToStorage } from '@/lib/supabase-storage'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,13 +13,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Ensure the events directory exists
-    const eventsDir = join(process.cwd(), 'public', 'images', 'events')
-    if (!existsSync(eventsDir)) {
-      await mkdir(eventsDir, { recursive: true })
-    }
-
-    const uploadedFiles: string[] = []
+    const uploadedFiles: { url: string; path: string }[] = []
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
@@ -34,21 +26,26 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Generate unique filename with .webp extension for better compression
-      const timestamp = Date.now()
-      const randomString = Math.random().toString(36).substring(2, 15)
-      const filename = `event-${timestamp}-${randomString}.webp`
-      
-      // Convert file to buffer
-      const bytes = await file.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      
-      // Save file to public/images/events
-      const filepath = join(eventsDir, filename)
-      await writeFile(filepath, buffer)
-      
-      // Add to uploaded files array
-      uploadedFiles.push(`/images/events/${filename}`)
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        return NextResponse.json(
+          { success: false, message: 'File size must be less than 10MB' },
+          { status: 400 }
+        )
+      }
+
+      try {
+        // Upload to Supabase Storage
+        const result = await uploadImageToStorage(file)
+        uploadedFiles.push(result)
+      } catch (error) {
+        console.error('Upload error for file:', file.name, error)
+        return NextResponse.json(
+          { success: false, message: `Failed to upload ${file.name}` },
+          { status: 500 }
+        )
+      }
     }
 
     return NextResponse.json({

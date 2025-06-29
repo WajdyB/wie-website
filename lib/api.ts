@@ -40,7 +40,14 @@ export async function uploadImages(files: File[]) {
     body: formData,
   })
 
-  return response.json()
+  const result = await response.json()
+  
+  // Extract URLs from the response for backward compatibility
+  if (result.success && result.files) {
+    result.urls = result.files.map((file: { url: string; path: string }) => file.url)
+  }
+  
+  return result
 }
 
 // Events API
