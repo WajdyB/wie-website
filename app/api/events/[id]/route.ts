@@ -4,11 +4,11 @@ import { supabase } from '@/lib/supabase'
 // PUT update event
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const eventData = await request.json()
-    const eventId = params.id
+    const { id: eventId } = await params
 
     // Validate required fields
     if (!eventData.title || !eventData.description || !eventData.date || !eventData.location) {
@@ -62,10 +62,10 @@ export async function PUT(
 // DELETE event
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const eventId = params.id
+    const { id: eventId } = await params
 
     const { error } = await supabase
       .from('events')
