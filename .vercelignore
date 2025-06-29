@@ -1,0 +1,14 @@
+# Exclude large image files from deployment
+public/images/events/*.JPG
+public/images/events/*.jpg
+public/images/events/*.png
+public/images/events/*.PNG
+
+# Keep only optimized images
+!public/images/events/*.webp
+!public/images/events/*.avif
+
+# Exclude other large directories if needed
+node_modules
+.next
+.git 

@@ -34,11 +34,10 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Generate unique filename
+      // Generate unique filename with .webp extension for better compression
       const timestamp = Date.now()
       const randomString = Math.random().toString(36).substring(2, 15)
-      const extension = file.name.split('.').pop()
-      const filename = `event-${timestamp}-${randomString}.${extension}`
+      const filename = `event-${timestamp}-${randomString}.webp`
       
       // Convert file to buffer
       const bytes = await file.arrayBuffer()
