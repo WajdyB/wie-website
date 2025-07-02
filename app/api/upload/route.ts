@@ -3,6 +3,15 @@ import { uploadImageToStorage } from '@/lib/supabase-storage'
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if environment variables are available
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase environment variables')
+      return NextResponse.json(
+        { success: false, message: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
     
@@ -42,7 +51,7 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error('Upload error for file:', file.name, error)
         return NextResponse.json(
-          { success: false, message: `Failed to upload ${file.name}` },
+          { success: false, message: `Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}` },
           { status: 500 }
         )
       }

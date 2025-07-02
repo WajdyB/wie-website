@@ -101,7 +101,7 @@ export default function HomePage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-purple-200 rounded-3xl transform rotate-6"></div>
                 <Image
-                  src="/images/home/hero_image.jpg"
+                  src="/images/home/hero-image.jpg"
                   alt="WIE ISIMM Members"
                   width={600}
                   height={500}
